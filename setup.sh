@@ -1,8 +1,4 @@
 #!/bin/bash
-# ─────────────────────────────────────────────────────────────
-#  LinuxWebUI — Quick Setup Script
-#  Run: sudo bash setup.sh
-# ─────────────────────────────────────────────────────────────
 
 PROJECT_DIR="/var/www/html/LinuxWebUI"
 CONFIG_DIR="$PROJECT_DIR/config"
@@ -17,15 +13,12 @@ echo "  ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═══
 echo "  WebUI Setup — v1.0.0"
 echo ""
 
-# ── Create directories ──
 mkdir -p "$CONFIG_DIR"
 echo "[✓] Directories created"
 
-# ── Ask for admin username ──
 read -p "  Enter admin username [default: admin]: " USERNAME
 USERNAME=${USERNAME:-admin}
 
-# ── Ask for password (hidden) ──
 echo -n "  Enter admin password: "
 read -s PASSWORD
 echo ""
@@ -38,10 +31,8 @@ if [ "$PASSWORD" != "$PASSWORD2" ]; then
     exit 1
 fi
 
-# ── Generate bcrypt hash via PHP ──
 HASH=$(php -r "echo password_hash('$PASSWORD', PASSWORD_BCRYPT);")
 
-# ── Write users.json ──
 cat > "$CONFIG_DIR/users.json" << EOF
 {
     "$USERNAME": "$HASH"
@@ -58,7 +49,7 @@ chmod 700 "$CONFIG_DIR"
 echo "[✓] Permissions set"
 
 # ── sudoers rule ──
-SUDOERS_FILE="/etc/sudoers.d/linuxwebui"
+SUDOERS_FILE="/etc/sudoers.d/LinuxWebUI"
 cat > "$SUDOERS_FILE" << 'SUDOERS'
 # LinuxWebUI — Allow www-data to control specific services only
 www-data ALL=(ALL) NOPASSWD: \
