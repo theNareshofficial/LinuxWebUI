@@ -1,8 +1,12 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_SESSION['user'])) {
-            header('location: ../index.php');
-            exit;
+
+    $base = dirname($_SERVER['SCRIPT_NAME']);
+    header('Location: /login.php');
+    exit;
 }
