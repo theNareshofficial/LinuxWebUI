@@ -40,21 +40,36 @@ function getCPU() {
 
 
 function getDisk() {
+    // disk_total_space('/') is blocked by open_basedir
+    $output = shell_exec('df -BG / 2>/dev/null');
+    
+    if (!$output) {
+        return ['total' => 0, 'used' => 0, 'free' => 0, 'percent' => 0];
+    }
 
-    $total = disk_total_space('/');
-    $free  = disk_free_space('/');
-    $used  = $total - $free;
+    $lines = explode("\n", trim($output));
+    
+    if (!isset($lines[1])) {
+        return ['total' => 0, 'used' => 0, 'free' => 0, 'percent' => 0];
+    }
 
-    $percent = round(($used / $total) * 100, 1);
+    // Split on whitespace, remove empty parts
+    $parts = preg_split('/\s+/', trim($lines[1]));
+
+    // Remove the 'G' suffix and cast to int
+    $total   = (int) str_replace('G', '', $parts[1] ?? '0');
+    $used    = (int) str_replace('G', '', $parts[2] ?? '0');
+    $free    = (int) str_replace('G', '', $parts[3] ?? '0');
+    // Use% is like "42%" — strip the %
+    $percent = (int) str_replace('%', '', $parts[4] ?? '0');
 
     return [
-        'total'   => round($total / 1073741824, 1),  
-        'used'    => round($used  / 1073741824, 1),  
-        'free'    => round($free  / 1073741824, 1),  
+        'total'   => $total,
+        'used'    => $used,
+        'free'    => $free,
         'percent' => $percent
     ];
 }
-
 
 function getUptime() {
 
@@ -75,7 +90,7 @@ function getUptime() {
     $str .= $hours   . 'h ';
     $str .= $minutes . 'm';
 
-    return trim($str);  // remove extra spaces
+    return trim($str); 
 }
 
 
