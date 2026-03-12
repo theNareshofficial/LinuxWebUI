@@ -1,31 +1,23 @@
 <?php
-
-require_once '../includes/auth.php';
-require_once '../includes/functions.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 header('Content-Type: application/json');
 
-// Tell browser NOT to cache (save) this response,We want fresh data every time, not old saved data
-header('Cache-Control: no-store, no-cache, must-revalidate');
-
-
-$ram      = getRAM();       
-$cpu      = getCPU();       
-$disk     = getDisk();      
-$uptime   = getUptime();    
-$hostinfo = getHostInfo();  
-
-
+$ram  = getRAM();
+$cpu  = getCPU();
+$disk = getDisk();
 
 $response = [
-    'ram'      => $ram,
-    'cpu'      => $cpu,
-    'disk'     => $disk,
-    'uptime'   => $uptime,
-    'host'     => $hostinfo,
-
-    'generated_at' => time()
+    'ram'    => $ram,
+    'cpu'    => [
+        'load_1m'  => $cpu['load_1m']  ?? $cpu[0] ?? 0,
+        'load_5m'  => $cpu['load_5m']  ?? $cpu[1] ?? 0,
+        'load_15m' => $cpu['load_15m'] ?? $cpu[2] ?? 0,
+    ],
+    'disk'   => $disk,
+    'uptime' => getUptime(),
+    'host'   => getHostInfo(),
 ];
-
 
 echo json_encode($response);
