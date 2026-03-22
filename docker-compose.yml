@@ -1,0 +1,17 @@
+name: LinuxWebUI
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: linuxwebui_web
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - /proc:/proc:ro
+      - /run/systemd:/run/systemd:ro
+      - /bin/systemctl:/bin/systemctl:ro
+    restart: unless-stopped
+    privileged: true
